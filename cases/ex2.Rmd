@@ -1,0 +1,68 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+```{r}
+names <- c("André", "Henrique", "Caio", "Gustavo")
+heights <- c(1.64, 1.74, 1.82, 1.60)
+df <- data.frame(name = names, height = heights)
+```
+
+```{r}
+calculate_mean <- function(df) {
+  return (mean(df$height))
+}
+
+calculate_populational_stdev <- function(df) {
+  data <- df$height
+  mean <- mean(data)
+  square_sum <- sum((data - mean) ^ 2)
+  result <- sqrt(square_sum/length(data))
+  return(result)
+}
+
+calculate_sample_stdev <- function(df) {
+  data <- df$height
+  mean <- mean(data)
+  square_sum <- sum((data - mean) ^ 2)
+  result <- sqrt(square_sum / (length(data) - 1))
+  return(result)
+}
+
+```
+
+```{r}
+K <- 3L
+calculate_sample <- function() {
+  sample_indexes <- sample(nrow(df), K, replace = TRUE)
+  sample <- df[sample_indexes[1:K], ]
+  return(sample)
+}
+```
+
+```{r}
+sample1 <- calculate_sample()
+sample2 <- calculate_sample()
+sample3 <- calculate_sample()
+```
+
+```{r}
+means_list <- list(population = calculate_mean(df),
+                   sample1 = calculate_mean(sample1),
+                   sample2 = calculate_mean(sample2),
+                   sample3 = calculate_mean(sample3))
+means_list
+```
+
+```{r}
+stdevs_list <- list(
+  population = calculate_populational_stdev(df),
+  sample1 = calculate_sample_stdev(sample1),
+  sample2 = calculate_sample_stdev(sample2),
+  sample3 = calculate_sample_stdev(sample3)
+)
+stdevs_list
+```

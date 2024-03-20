@@ -1,0 +1,478 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Case 1 - Análise de dados
+
+## 1. Análise de dados
+
+### Preparação
+
+Declaração de bibliotecas
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(DescTools)
+```
+
+Leitura do arquivo de dados
+
+```{r}
+df = read_rds("spotify_modificada.rds")
+```
+
+Subsets
+
+```{r}
+df_novos = subset(df, status == "Novo")
+df_velhos = subset(df, status == "Velho")
+```
+
+### Cálculo das medidas de disperção
+
+Duração
+
+```{r}
+resultados_novos_duracao_media = mean(df_novos$duration_ms)
+resultados_novos_duracao_mediana = median(df_novos$duration_ms)
+resultados_novos_duracao_moda = Mode(df_novos$duration_ms)
+resultados_novos_duracao_variancia = var(df_novos$duration_ms)
+resultados_novos_duracao_desvpad = sd(df_novos$duration_ms)
+resultados_novos_popularidade_amplitude <- range(df_novos$track_popularity)
+resultados_novos_duracao_amplitude[2] - resultados_novos_duracao_amplitude[1]
+```
+
+```{r}
+resultados_velhos_duracao_media = mean(df_velhos$duration_ms)
+resultados_velhos_duracao_mediana = median(df_velhos$duration_ms)
+resultados_velhos_duracao_moda = Mode(df_velhos$duration_ms)
+resultados_velhos_duracao_variancia = var(df_velhos$duration_ms)
+resultados_velhos_duracao_desvpad = sd(df_velhos$duration_ms)
+resultados_velhos_duracao_amplitude = range(df_velhos$duration_ms)
+resultados_velhos_duracao_amplitude[2] - resultados_velhos_duracao_amplitude[1]
+```
+
+Dançabilidade
+
+```{r}
+resultados_novos_dancabilidade_media = mean(df_novos$danceability)
+resultados_novos_dancabilidade_mediana = median(df_novos$danceability)
+resultados_novos_dancabilidade_moda = Mode(df_novos$danceability)
+resultados_novos_dancabilidade_variancia = var(df_novos$danceability)
+resultados_novos_dancabilidade_desvpad = sd(df_novos$danceability)
+resultados_novos_dancabilidade_amplitude = range(df_novos$danceability)
+resultados_novos_dancabilidade_amplitude[2] - resultados_novos_dancabilidade_amplitude[1]
+```
+
+```{r}
+resultados_velhos_dancabilidade_media = mean(df_velhos$danceability)
+resultados_velhos_dancabilidade_mediana = median(df_velhos$danceability)
+resultados_velhos_dancabilidade_moda = Mode(df_velhos$danceability)
+resultados_velhos_dancabilidade_variancia = var(df_velhos$danceability)
+resultados_velhos_dancabilidade_desvpad = sd(df_velhos$danceability)
+resultados_velhos_dancabilidade_amplitude = range(df_velhos$danceability)
+resultados_velhos_dancabilidade_amplitude[2] - resultados_velhos_dancabilidade_amplitude[1]
+
+```
+
+Popularidade
+
+```{r}
+resultados_novos_popularidade_media = mean(df_novos$track_popularity)
+resultados_novos_popularidade_mediana = median(df_novos$track_popularity)
+resultados_novos_popularidade_moda = Mode(df_novos$track_popularity)
+resultados_novos_popularidade_variancia = var(df_novos$track_popularity)
+resultados_novos_popularidade_desvpad = sd(df_novos$track_popularity)
+resultados_novos_popularidade_amplitude = range(df_novos$track_popularity)
+resultados_novos_popularidade_amplitude[2] - resultados_novos_popularidade_amplitude[1]
+```
+
+```{r}
+resultados_velhos_popularidade_media = mean(df_velhos$track_popularity)
+resultados_velhos_popularidade_mediana = median(df_velhos$track_popularity)
+resultados_velhos_popularidade_moda = Mode(df_velhos$track_popularity)
+resultados_velhos_popularidade_variancia = var(df_velhos$track_popularity)
+resultados_velhos_popularidade_desvpad = sd(df_velhos$track_popularity)
+resultados_velhos_popularidade_amplitude = range(df_velhos$track_popularity)
+resultados_velhos_popularidade_amplitude[2] - resultados_velhos_popularidade_amplitude[1]
+```
+
+### Boxplot
+
+```{r}
+ggplot(df, aes(x = status, y = duration_ms)) + geom_boxplot()
+ggplot(df, aes(x = status, y = danceability)) + geom_boxplot()
+ggplot(df, aes(x = status, y = track_popularity)) + geom_boxplot()
+```
+
+### Histogramas
+
+Popularidade para músicas velhas; sem densidade
+
+```{r}
+ggplot(df_velhos, aes(x = track_popularity)) +
+  geom_histogram(
+    color = "#000000", fill =
+      "#FFFF00"
+  )
+```
+
+#### Histogramas sem linha de média
+
+Todas
+
+```{r}
+ggplot(df, aes(x = duration_ms)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density()
+ggplot(df, aes(x = danceability)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density()
+ggplot(df, aes(x = track_popularity)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density()
+```
+
+Novas
+
+```{r}
+ggplot(df_novos, aes(x = duration_ms)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density()
+ggplot(df_novos, aes(x = danceability)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density()
+ggplot(df_novos, aes(x = track_popularity)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density()
+```
+
+Velhas
+
+```{r}
+ggplot(df_velhos, aes(x = duration_ms)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density()
+ggplot(df_velhos, aes(x = danceability)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density()
+ggplot(df_velhos, aes(x = track_popularity)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density()
+```
+
+#### Histogramas com linha de média
+
+Todas
+
+```{r}
+ggplot(df, aes(x = duration_ms)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density() +
+  geom_vline(
+    xintercept = mean(df$duration_ms),
+    col = "#FF0000",
+    lwd = 1
+  ) +
+  annotate(
+    "text",
+    x = mean(df$duration_ms) * 1.7,
+    y = 0.00001,
+    label = paste("Média =", mean(df$duration_ms)),
+    col = "red",
+    size = 6
+  )
+
+ggplot(df, aes(x = danceability)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density() +
+  geom_vline(
+    xintercept = mean(df$danceability),
+    col = "#FF0000",
+    lwd = 1
+  ) +
+  annotate(
+    "text",
+    x = mean(df$danceability) * 1.7,
+    y = 3,
+    label = paste("Média =", mean(df$danceability)),
+    col = "red",
+    size = 6
+  )
+
+ggplot(df, aes(x = track_popularity)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density() +
+  geom_vline(
+    xintercept = mean(df$track_popularity),
+    col = "#FF0000",
+    lwd = 1
+  ) +
+  annotate(
+    "text",
+    x = mean(df$track_popularity) * 1.7,
+    y = 0.03,
+    label = paste("Média =", mean(df$track_popularity)),
+    col = "red",
+    size = 6
+  )
+```
+
+Novas
+
+```{r}
+ggplot(df_novos, aes(x = duration_ms)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density() +
+  geom_vline(
+    xintercept = mean(df_novos$duration_ms),
+    col = "#FF0000",
+    lwd = 1
+  ) +
+  annotate(
+    "text",
+    x = mean(df_novos$duration_ms) * 1.7,
+    y = 0.00001,
+    label = paste("Média =", mean(df_novos$duration_ms)),
+    col = "red",
+    size = 6
+  )
+
+ggplot(df_novos, aes(x = danceability)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density() +
+  geom_vline(
+    xintercept = mean(df_novos$danceability),
+    col = "#FF0000",
+    lwd = 1
+  ) +
+  annotate(
+    "text",
+    x = mean(df_novos$danceability) * 1.7,
+    y = 3,
+    label = paste("Média =", mean(df_novos$danceability)),
+    col = "red",
+    size = 6
+  )
+
+ggplot(df_novos, aes(x = track_popularity)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density() +
+  geom_vline(
+    xintercept = mean(df_novos$track_popularity),
+    col = "#FF0000",
+    lwd = 1
+  ) +
+  annotate(
+    "text",
+    x = mean(df_novos$track_popularity) * 1.7,
+    y = 0.03,
+    label = paste("Média =", mean(df_novos$track_popularity)),
+    col = "red",
+    size = 6
+  )
+```
+
+Velhas
+
+```{r}
+ggplot(df_velhos, aes(x = duration_ms)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density() +
+  geom_vline(
+    xintercept = mean(df_velhos$duration_ms),
+    col = "#FF0000",
+    lwd = 1
+  ) +
+  annotate(
+    "text",
+    x = mean(df_velhos$duration_ms) * 1.7,
+    y = 0.00001,
+    label = paste("Média =", mean(df_velhos$duration_ms)),
+    col = "red",
+    size = 6
+  )
+
+ggplot(df_velhos, aes(x = danceability)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density() +
+  geom_vline(
+    xintercept = mean(df_velhos$danceability),
+    col = "#FF0000",
+    lwd = 1
+  ) +
+  annotate(
+    "text",
+    x = mean(df_velhos$danceability) * 1.7,
+    y = 3,
+    label = paste("Média =", mean(df_velhos$danceability)),
+    col = "red",
+    size = 6
+  )
+
+ggplot(df_velhos, aes(x = track_popularity)) +
+  geom_histogram(aes(y = ..density..),
+    color = "#000000",
+    fill = "#FFFF00"
+  ) +
+  geom_density() +
+  geom_vline(
+    xintercept = mean(df_velhos$track_popularity),
+    col = "#FF0000",
+    lwd = 1
+  ) +
+  annotate(
+    "text",
+    x = mean(df_velhos$track_popularity) * 1.7,
+    y = 0.03,
+    label = paste("Média =", mean(df_velhos$track_popularity)),
+    col = "red",
+    size = 6
+  )
+```
+
+## 2. Amostragem
+
+```{r}
+K <- 200L
+Z <- sample(1:nrow(df), K, replace=TRUE)
+```
+
+```{r}
+amostra2 <- df[Z[1:K],]
+```
+
+Análise gráfica - amostra
+
+```{r}
+ggplot(amostra, aes(x = playlist_genre)) +
+  geom_bar(
+    aes(y = (..count..) *
+      100 / nrow(amostra)),
+    color = "#000000",
+    fill = "#A2EFEF"
+  ) +
+  xlab("Gênero") +
+  ylab("Porcentagem (%)")
+
+genre_counts <- table(amostra$playlist_genre)
+genre_percentages <- prop.table(genre_counts) * 100
+pie(genre_percentages, labels = paste(names(genre_percentages), "(", round(genre_percentages, 1), "%)"), main = "Genre Distribution - Sample")
+```
+
+Análise gráfica - população
+
+```{r}
+ggplot(df, aes(x = playlist_genre)) +
+  geom_bar(
+    aes(y = (..count..) * 100 /
+      nrow(df)),
+    color = "#000000",
+    fill = "#A2EFEF"
+  ) +
+  xlab("Gênero") +
+  ylab("Porcentagem (%)")
+
+genre_counts <- table(df$playlist_genre)
+genre_percentages <- prop.table(genre_counts) * 100
+pie(genre_percentages, labels = paste(names(genre_percentages), "(", round(genre_percentages, 1), "%)"), main = "Genre Distribution - Population")
+```
+
+```{r}
+genres <- c("latin","edm","rock","rap","r&b","pop")
+```
+
+```{r}
+get_genre_subset <- function(genre) {
+  subset(df, df$playlist_genre==genre)
+}
+```
+
+```{r}
+regra_de_3 <- function(n_total, n_partial, K) {
+  return (round((n_partial * K) / n_total))
+}
+```
+
+```{r}
+genres_strats_sizes <- NULL
+for(genre in genres) {
+  genre_subset <- get_genre_subset(genre)
+  n_genre <- nrow(genre_subset)
+  n_strat <- regra_de_3(n_total, n_genre, K)
+  genres_strats_sizes[genre] <- n_strat
+}
+genres_strats_sizes
+```
+
+```{r}
+stratified_sample <- NULL
+for(genre in genres) {
+  genre_df <- get_genre_subset(genre)
+  K <- genres_strats_sizes[genre]
+  Z <- sample(1:nrow(genre_df), K, replace=TRUE)
+  sample <- df[Z[1:K],]
+  stratified_sample <- rbind(stratified_sample, sample)
+}
+```
+
+```{r}
+genre_counts <- table(df$playlist_genre)
+genre_percentages <- prop.table(genre_counts) * 100
+pie(genre_percentages, labels = paste(names(genre_percentages), "(", round(genre_percentages, 1), "%)"), main = "Genre Distribution - Stratified Sample")
+```
