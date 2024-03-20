@@ -1,3 +1,90 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
 ```{r}
-  
+library(ggplot2)
+source("utils.R")
+```
+
+```{r}
+df <- readRDS("cases/spotify_modificada.rds")
+```
+
+```{r}
+generate_new_samples_measures <- function(K, M) {
+  samples_measures <<- data.frame(mean = numeric(),
+                                 var = numeric())
+  for (i in 1:M) {
+    sample_indexes <- sample(nrow(df), K, replace = TRUE)
+    new_sample  <- df[sample_indexes[1:K], ]
+    mean <- mean(new_sample$duration_ms)
+    var <- sample_var(new_sample$duration_ms)
+    new_row <- data.frame(mean = mean, var = var)
+    samples_measures <<- rbind(samples_measures, new_row)
+  }
+}
+```
+
+```{r}
+display_means_info <- function() {
+  print(paste("Mean of Sample Means:", mean_of_sample_means))
+  difference <- mean_of_sample_means - population_mean
+  print(paste("Difference:", round(difference, digits = 2)))
+  error <-
+    (mean_of_sample_means - population_mean) / population_mean
+  print(paste("Error:", round(error * 100, digits = 1), "%"))
+}
+```
+
+```{r}
+display_vars_info <- function() {
+  print(paste("Mean of Sample Vars:", mean_of_sample_vars))
+  difference <- mean_of_sample_vars - population_var
+  print(paste("Difference:", round(difference, digits = 2)))
+  error <- (mean_of_sample_vars - population_var) / population_var
+  print(paste("Error:", round(error * 100, digits = 1), "%"))
+}
+```
+
+```{r}
+display_info <-
+  function(K, M) {
+    print(paste("Sample Size:", K))
+    print(paste("Number of Samples:", M))
+    
+    display_means_info()
+    display_vars_info()
+    
+    hist(samples_measures$mean, breaks = 20)
+    hist(samples_measures$var, breaks = 20)
+    print("-------------------------------------------------")
+  }
+```
+
+```{r}
+calculate_new_sample <- function(K, M) {
+  generate_new_samples_measures(K, M)
+  mean_of_sample_means <<- mean(samples_measures$mean)
+  mean_of_sample_vars <<- mean(samples_measures$var)
+  display_info(K, M)
+}
+```
+
+```{r}
+calculate_population_info <- function() {
+  population_mean <- mean(df$duration_ms)
+  population_var <- populational_var(df$duration_ms)
+  print(paste("Population Mean:", population_mean))
+  print(paste("Population Var:", population_var))
+}
+```
+
+```{r}
+calculate_population_info()
+calculate_new_sample(200, 450)
+calculate_new_sample(200, 40)
+calculate_new_sample(200, 2000)
 ```
