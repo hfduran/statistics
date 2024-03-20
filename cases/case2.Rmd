@@ -58,8 +58,10 @@ display_info <-
     display_means_info()
     display_vars_info()
     
-    hist(samples_measures$mean, breaks = 20)
-    hist(samples_measures$var, breaks = 20)
+    hist(samples_measures$mean,
+         main = paste("Samples means for", M, "samples"))
+    hist(samples_measures$var,
+         main = paste("Samples vars for", M, "samples"))
     print("-------------------------------------------------")
   }
 ```
@@ -75,10 +77,11 @@ calculate_new_sample <- function(K, M) {
 
 ```{r}
 calculate_population_info <- function() {
-  population_mean <- mean(df$duration_ms)
-  population_var <- populational_var(df$duration_ms)
+  population_mean <<- mean(df$duration_ms)
+  population_var <<- populational_var(df$duration_ms)
   print(paste("Population Mean:", population_mean))
   print(paste("Population Var:", population_var))
+  print("-------------------------------------------------")
 }
 ```
 
