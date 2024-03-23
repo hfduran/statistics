@@ -4,6 +4,8 @@ output:
   html_document: default
 ---
 
+## Distribuição Amostral
+
 ```{r}
 library(ggplot2)
 source("utils.R")
@@ -19,7 +21,7 @@ generate_new_samples_measures <- function(K, M) {
                                  var = numeric())
   for (i in 1:M) {
     sample_indexes <- sample(nrow(df), K, replace = TRUE)
-    new_sample  <- df[sample_indexes[1:K], ]
+    new_sample  <<- df[sample_indexes[1:K], ]
     mean <- mean(new_sample$duration_ms)
     var <- sample_var(new_sample$duration_ms)
     new_row <- data.frame(mean = mean, var = var)
@@ -59,9 +61,13 @@ display_info <-
     display_vars_info()
     
     hist(samples_measures$mean,
-         main = paste("Samples means for", M, "samples"))
+         main = paste("Samples means for", M, "samples"),
+         xlab = "Mean",
+         breaks = 20)
     hist(samples_measures$var,
-         main = paste("Samples vars for", M, "samples"))
+         main = paste("Samples variances for", M, "samples"),
+         xlab = "Variance",
+         breaks = 20)
     print("-------------------------------------------------")
   }
 ```
@@ -86,8 +92,27 @@ calculate_population_info <- function() {
 ```
 
 ```{r}
+K <- 200L
 calculate_population_info()
-calculate_new_sample(200, 450)
-calculate_new_sample(200, 40)
-calculate_new_sample(200, 2000)
+calculate_new_sample(K, 40L)
+calculate_new_sample(K, 450L)
+calculate_new_sample(K, 2600L)
+```
+
+## Intervalo de Confiança
+
+```{r}
+confiance_interval <- function(data, alpha, populational_stdev=NULL) {
+  z <- qnorm(alpha)
+  n <- length(data)
+  stdev <- populational_stdev
+  if (is.null(stdev)) {
+    stdev <- sample_stdev(data)
+  }
+  return (z * stdev/sqrt(n))
+}
+```
+
+```{r}
+
 ```
