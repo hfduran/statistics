@@ -8,11 +8,11 @@ output:
 
 ```{r}
 library(ggplot2)
-source("utils.R")
+source("../utils.R")
 ```
 
 ```{r}
-df <- readRDS("cases/spotify_modificada.rds")
+df <- readRDS("spotify_modificada.rds")
 ```
 
 ```{r}
@@ -102,17 +102,142 @@ calculate_new_sample(K, 2600L)
 ## Intervalo de Confiança
 
 ```{r}
-confiance_interval <- function(data, alpha, populational_stdev=NULL) {
-  z <- qnorm(alpha)
+normal_error <- function(data, alpha, pop_stdev) {
+  z <- qnorm(1 - alpha)
   n <- length(data)
-  stdev <- populational_stdev
-  if (is.null(stdev)) {
-    stdev <- sample_stdev(data)
-  }
+  stdev <- pop_stdev
   return (z * stdev/sqrt(n))
 }
 ```
 
 ```{r}
+student_error <- function(data, alpha) {
+  n <- length(data)
+  t <- qt(1 - alpha, n - 1)
+  stdev <- sample_stdev(data)
+  return (t * stdev/sqrt(n))
+}
+```
 
+## Gráfico da distribuição de probabilidade
+
+```{r}
+normal_graph <- function(mean, sd, error, title, xlabel, ylabel) {
+  x <- seq(-5 + mean, 5 + mean, by = .01)
+  y <- dnorm(x, mean = mean, sd = sd)
+  df_distr <- data.frame(x = x, y = y)
+  ggplot(df_distr, aes(x = x, y = y)) +
+    geom_point() +
+    ggtitle(title) +
+    xlab(xlabel) +
+    ylab(ylabel) +
+    geom_vline(xintercept = (mean - error)) +
+    geom_vline(xintercept = (mean + error))
+}
+```
+
+## Cálculo do Erro - Normal - 95%
+
+```{r}
+df_new = subset(df, status=="Novo")
+df_old = subset(df, status=="Velho")
+
+sample_size = 450
+
+###AQUI NEW SAMPLE
+###ONLY EXECUTE these next lines when it's needed an all-new sample.
+sample_new = df_new[sample(nrow(df_new), sample_size, replace = TRUE),]
+sample_old = df_old[sample(nrow(df_old), sample_size, replace = TRUE),]
+
+error_new_n = normal_error(sample_new$duration_ms / 60000, 0.025, 4.0)
+
+error_old_n = normal_error(sample_old$duration_ms / 60000, 0.025, 7.0)
+
+print(paste("Mean confidence interval for new musics sample (95%):", mean(sample_new$duration_ms / 60000), "+/-", error_new_n))
+
+print(paste("Mean confidence interval for old musics sample (95%):", mean(sample_old$duration_ms / 60000), "+/-", error_old_n))
+
+print(paste("Valor tabelado: ", qnorm(0.975)))
+
+normal_graph(mean(sample_new$duration_ms / 60000), 4.0, error_new_n, "Distribuição Normal para Duração Músicas Novas - 95% de Confiança", "Duração", "Densidade de Probabilidade")
+
+normal_graph(mean(sample_old$duration_ms / 60000), 7.0, error_old_n, "Distribuição Normal para Duração Músicas Velhas - 95% de Confiança", "Duração", "Densidade de Probabilidade")
+```
+
+## Cálculo do Erro - Normal - 90%
+
+```{r}
+error_new_n = normal_error(sample_new$duration_ms / 60000, 0.05, 4.0)
+
+error_old_n = normal_error(sample_old$duration_ms / 60000, 0.05, 7.0)
+
+print(paste("Mean confidence interval for new musics sample (90%):", mean(sample_new$duration_ms / 60000), "+/-", error_new_n))
+
+print(paste("Mean confidence interval for old musics sample (90%):", mean(sample_old$duration_ms / 60000), "+/-", error_old_n))
+
+print(paste("Valor tabelado: ", qnorm(0.950)))
+
+normal_graph(mean(sample_new$duration_ms / 60000), 4.0, error_new_n, "Distribuição Normal para Duração Músicas Novas - 90% de Confiança", "Duração", "Densidade de Probabilidade")
+
+normal_graph(mean(sample_old$duration_ms / 60000), 7.0, error_old_n, "Distribuição Normal para Duração Músicas Velhas - 90% de Confiança", "Duração", "Densidade de Probabilidade")
+```
+
+## Cálculo do Erro - Normal - 99%
+
+```{r}
+error_new_n = normal_error(sample_new$duration_ms / 60000, 0.005, 4.0)
+
+error_old_n = normal_error(sample_old$duration_ms / 60000, 0.005, 7.0)
+
+print(paste("Mean confidence interval for new musics sample (99%):", mean(sample_new$duration_ms / 60000), "+/-", error_new_n))
+
+print(paste("Mean confidence interval for old musics sample (99%):", mean(sample_old$duration_ms / 60000), "+/-", error_old_n))
+
+print(paste("Valor tabelado: ", qnorm(0.995)))
+
+normal_graph(mean(sample_new$duration_ms / 60000), 4.0, error_new_n, "Distribuição Normal para Duração Músicas Novas - 99% de Confiança", "Duração", "Densidade de Probabilidade")
+
+normal_graph(mean(sample_old$duration_ms / 60000), 7.0, error_old_n, "Distribuição Normal para Duração Músicas Velhas - 99% de Confiança", "Duração", "Densidade de Probabilidade")
+```
+
+## Cálculo do Erro - T-Student - 95%
+
+```{r}
+error_new_t = student_error(sample_new$duration_ms / 60000, 0.025)
+
+error_old_t = student_error(sample_old$duration_ms / 60000, 0.025)
+
+print(paste("Mean confidence interval for new musics sample (95%):", mean(sample_new$duration_ms / 60000), "+/-", error_new_t))
+
+print(paste("Mean confidence interval for old musics sample (95%):", mean(sample_old$duration_ms / 60000), "+/-", error_old_t))
+
+print(paste("GL:", (sample_size - 1), "; Valor tabelado:", qt(0.975, sample_size - 1)))
+```
+
+## Cálculo do Erro - T-Student - 90%
+
+```{r}
+error_new_t = student_error(sample_new$duration_ms / 60000, 0.05)
+
+error_old_t = student_error(sample_old$duration_ms / 60000, 0.05)
+
+print(paste("Mean confidence interval for new musics sample (90%):", mean(sample_new$duration_ms / 60000), "+/-", error_new_t))
+
+print(paste("Mean confidence interval for old musics sample (90%):", mean(sample_old$duration_ms / 60000), "+/-", error_old_t))
+
+print(paste("GL:", (sample_size - 1), "; Valor tabelado:", qt(0.950, sample_size - 1)))
+```
+
+## Cálculo do Erro - T-Student - 99%
+
+```{r}
+error_new_t = student_error(sample_new$duration_ms / 60000, 0.005)
+
+error_old_t = student_error(sample_old$duration_ms / 60000, 0.005)
+
+print(paste("Mean confidence interval for new musics sample (99%):", mean(sample_new$duration_ms / 60000), "+/-", error_new_t))
+
+print(paste("Mean confidence interval for old musics sample (99%):", mean(sample_old$duration_ms / 60000), "+/-", error_old_t))
+
+print(paste("GL:", (sample_size - 1), "; Valor tabelado:", qt(0.995, sample_size - 1)))
 ```
