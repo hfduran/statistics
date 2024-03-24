@@ -22,8 +22,8 @@ generate_new_samples_measures <- function(K, M) {
   for (i in 1:M) {
     sample_indexes <- sample(nrow(df), K, replace = TRUE)
     new_sample  <<- df[sample_indexes[1:K], ]
-    mean <- mean(new_sample$duration_ms)
-    var <- sample_var(new_sample$duration_ms)
+    mean <- mean(new_sample$duration_ms) / 60000
+    var <- sample_var(new_sample$duration_ms) / 3600000000
     new_row <- data.frame(mean = mean, var = var)
     samples_measures <<- rbind(samples_measures, new_row)
   }
@@ -33,6 +33,7 @@ generate_new_samples_measures <- function(K, M) {
 ```{r}
 display_means_info <- function() {
   print(paste("Mean of Sample Means:", mean_of_sample_means))
+  print(paste("Populational Mean:", population_mean))
   difference <- mean_of_sample_means - population_mean
   print(paste("Difference:", round(difference, digits = 2)))
   error <-
@@ -44,6 +45,7 @@ display_means_info <- function() {
 ```{r}
 display_vars_info <- function() {
   print(paste("Mean of Sample Vars:", mean_of_sample_vars))
+  print(paste("Populational Var:", population_var))
   difference <- mean_of_sample_vars - population_var
   print(paste("Difference:", round(difference, digits = 2)))
   error <- (mean_of_sample_vars - population_var) / population_var
@@ -83,8 +85,8 @@ calculate_new_sample <- function(K, M) {
 
 ```{r}
 calculate_population_info <- function() {
-  population_mean <<- mean(df$duration_ms)
-  population_var <<- populational_var(df$duration_ms)
+  population_mean <<- mean(df$duration_ms) / 60000
+  population_var <<- populational_var(df$duration_ms) / 3600000000
   print(paste("Population Mean:", population_mean))
   print(paste("Population Var:", population_var))
   print("-------------------------------------------------")
