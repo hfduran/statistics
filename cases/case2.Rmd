@@ -8,11 +8,11 @@ output:
 
 ```{r}
 library(ggplot2)
-source("../utils.R")
+source("utils.R")
 ```
 
 ```{r}
-df <- readRDS("spotify_modificada.rds")
+df <- readRDS("cases/spotify_modificada.rds")
 ```
 
 ```{r}
@@ -76,7 +76,7 @@ display_info <-
 calculate_new_sample <- function(K, M) {
   generate_new_samples_measures(K, M)
   mean_of_sample_means <<- mean(samples_measures$mean)
-  mean_of_sample_vars <<- mean(samples_measures$var)
+  mean_of_sample_var <<- mean(samples_measures$var)
   display_info(K, M)
 }
 ```
@@ -153,9 +153,23 @@ error_new_n = normal_error(sample_new$duration_ms / 60000, 0.025, 4.0)
 
 error_old_n = normal_error(sample_old$duration_ms / 60000, 0.025, 7.0)
 
-print(paste("Mean confidence interval for new musics sample (95%):", mean(sample_new$duration_ms / 60000), "+/-", error_new_n))
 
-print(paste("Mean confidence interval for old musics sample (95%):", mean(sample_old$duration_ms / 60000), "+/-", error_old_n))
+print(paste(
+  "Mean confidence interval for new musics sample (95%):",
+  round(mean(sample_new$duration_ms / 60000), 2),
+  "+/-",
+  round(error_new_n, 2)
+))
+
+print(
+  paste(
+    "Mean confidence interval for old musics sample (95%):",
+    round(mean(sample_old$duration_ms / 60000),
+          2),
+    "+/-",
+    round(error_old_n, 2)
+  )
+)
 
 print(paste("Valor tabelado: ", qnorm(0.975)))
 
@@ -171,9 +185,9 @@ error_new_n = normal_error(sample_new$duration_ms / 60000, 0.05, 4.0)
 
 error_old_n = normal_error(sample_old$duration_ms / 60000, 0.05, 7.0)
 
-print(paste("Mean confidence interval for new musics sample (90%):", mean(sample_new$duration_ms / 60000), "+/-", error_new_n))
+print(paste("Mean confidence interval for new musics sample (90%):", round(mean(sample_new$duration_ms / 60000), 2), "+/-", round(error_new_n, 2)))
 
-print(paste("Mean confidence interval for old musics sample (90%):", mean(sample_old$duration_ms / 60000), "+/-", error_old_n))
+print(paste("Mean confidence interval for old musics sample (90%):", round(mean(sample_old$duration_ms / 60000), 2), "+/-", round(error_old_n, 2)))
 
 print(paste("Valor tabelado: ", qnorm(0.950)))
 
@@ -189,9 +203,9 @@ error_new_n = normal_error(sample_new$duration_ms / 60000, 0.005, 4.0)
 
 error_old_n = normal_error(sample_old$duration_ms / 60000, 0.005, 7.0)
 
-print(paste("Mean confidence interval for new musics sample (99%):", mean(sample_new$duration_ms / 60000), "+/-", error_new_n))
+print(paste("Mean confidence interval for new musics sample (99%):", round(mean(sample_new$duration_ms / 60000), 2), "+/-", round(error_new_n, 2)))
 
-print(paste("Mean confidence interval for old musics sample (99%):", mean(sample_old$duration_ms / 60000), "+/-", error_old_n))
+print(paste("Mean confidence interval for old musics sample (99%):", round(mean(sample_old$duration_ms / 60000), 2), "+/-", round(error_old_n, 2)))
 
 print(paste("Valor tabelado: ", qnorm(0.995)))
 
@@ -207,9 +221,9 @@ error_new_t = student_error(sample_new$duration_ms / 60000, 0.025)
 
 error_old_t = student_error(sample_old$duration_ms / 60000, 0.025)
 
-print(paste("Mean confidence interval for new musics sample (95%):", mean(sample_new$duration_ms / 60000), "+/-", error_new_t))
+print(paste("Mean confidence interval for new musics sample (95%):", round(mean(sample_new$duration_ms / 60000),2), "+/-", round(error_new_t, 2)))
 
-print(paste("Mean confidence interval for old musics sample (95%):", mean(sample_old$duration_ms / 60000), "+/-", error_old_t))
+print(paste("Mean confidence interval for old musics sample (95%):", round(mean(sample_old$duration_ms / 60000), 2), "+/-", round(error_old_t, 2)))
 
 print(paste("GL:", (sample_size - 1), "; Valor tabelado:", qt(0.975, sample_size - 1)))
 ```
