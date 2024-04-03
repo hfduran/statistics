@@ -1,0 +1,66 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+install.packages("tidyverse")
+install.packages("ggplot2")
+library(tidyverse)
+library(ggplot2)
+source("../utils.R")
+```
+
+```{r}
+df <- readRDS("cripto.rds")
+```
+
+```{r}
+df_dogecoin = subset(df, name=="Dogecoin")
+df_stellar = subset(df, name=="Stellar")
+df_xrp = subset(df, name=="XRP")
+```
+
+```{r}
+ggplot(df_dogecoin, aes(x=date, y=close)) +
+  geom_line() +
+  ggtitle("Evolução do preço de fechamento - Dogecoin") +
+  xlab("Tempo (anos)") +
+  ylab("Preço (R$)")
+
+ggplot(df_stellar, aes(x=date, y=close)) +
+  geom_line() +
+  ggtitle("Evolução do preço de fechamento - Stellar") +
+  xlab("Tempo (anos)") +
+  ylab("Preço (R$)")
+
+ggplot(df_xrp, aes(x=date, y=close)) +
+  geom_line() +
+  ggtitle("Evolução do preço de fechamento - XRP") +
+  xlab("Tempo (anos)") +
+  ylab("Preço (R$)")
+```
+
+```{r}
+calc_return_and_plot = function(data) {
+  for(i in 2:nrow(data)) {
+    data$return[i] = log(data$close[i] / data$close[i-1])
+  }
+  
+  clean_data = data[-1,]
+  
+  ggplot(clean_data, aes(x=date, y=return)) +
+  geom_line()
+  
+}
+```
+
+```{r}
+df_dogecoin$return = 0
+df_stellar$return = 0
+df_xrp$return = 0
+calc_return_and_plot(df_dogecoin)
+calc_return_and_plot(df_stellar)
+calc_return_and_plot(df_xrp)
+```
