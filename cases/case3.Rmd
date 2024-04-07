@@ -1,0 +1,163 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+install.packages("tidyverse")
+install.packages("ggplot2")
+library(tidyverse)
+library(ggplot2)
+source("../utils.R")
+```
+
+```{r}
+df <- readRDS("cripto.rds")
+```
+
+```{r}
+df_dogecoin = subset(df, name=="Dogecoin")
+df_stellar = subset(df, name=="Stellar")
+df_xrp = subset(df, name=="XRP")
+```
+
+```{r}
+ggplot(df_dogecoin, aes(x=date, y=close)) +
+  geom_line() +
+  ggtitle("Evolução do preço de fechamento - Dogecoin") +
+  xlab("Tempo (anos)") +
+  ylab("Preço (R$)")
+
+ggplot(df_stellar, aes(x=date, y=close)) +
+  geom_line() +
+  ggtitle("Evolução do preço de fechamento - Stellar") +
+  xlab("Tempo (anos)") +
+  ylab("Preço (R$)")
+
+ggplot(df_xrp, aes(x=date, y=close)) +
+  geom_line() +
+  ggtitle("Evolução do preço de fechamento - XRP") +
+  xlab("Tempo (anos)") +
+  ylab("Preço (R$)")
+```
+
+```{r}
+calc_return = function(data) {
+  
+}
+```
+
+```{r}
+calc_returns = function(data) {
+  for(i in 2:nrow(data)) {
+    data$return[i] = log(data$close[i] / data$close[i-1])
+  }
+  
+  clean_data = data[-1,]
+  
+  return (clean_data)
+}
+```
+
+```{r}
+plot_returns = function(data, title) {
+  ggplot(data, aes(x=date, y=return * 100)) +
+  geom_line() +
+  ggtitle(title) +
+  xlab("Tempo (anos)") +
+  ylab("Retorno (%)")
+}
+```
+
+```{r}
+df_dogecoin$return = 0
+df_stellar$return = 0
+df_xrp$return = 0
+
+df_dogecoin_ret = calc_returns(df_dogecoin)
+df_stellar_ret = calc_returns(df_stellar)
+df_xrp_ret = calc_returns(df_xrp)
+
+plot_returns(df_dogecoin_ret, "Evolução do retorno - Dogecoin")
+plot_returns(df_stellar_ret, "Evolução do retorno - Stellar")
+plot_returns(df_xrp_ret, "Evolução do retorno - XRP")
+```
+
+```{r}
+plot_bars = function(data, title) {
+  ggplot(data, aes(substr(date, 1, 7))) +
+  geom_bar() +
+  ggtitle(title) + 
+  theme(axis.text.x = element_text(angle = 90)) +
+  ylab("Frequência") +
+  xlab("Mês")
+}
+```
+
+```{r}
+df_dogecoin_filtered = filter(df_dogecoin_ret, return > 0.025)
+df_stellar_filtered = filter(df_stellar_ret, return > 0.025)
+df_xrp_filtered = filter(df_xrp_ret, return > 0.025)
+
+plot_bars(df_dogecoin_filtered, "a")
+plot_bars(df_stellar_filtered, "a")
+plot_bars(df_xrp_filtered, "a")
+```
+
+```{r}
+plot_histogram = function(data, aes_func, title) {
+  print(round(sqrt(nrow(data)), digits = 0))
+  ggplot(data, aes_func) +
+  geom_histogram(bins = round(sqrt(nrow(data)), digits = 0)) +
+  ggtitle(title) + 
+  ylab("Frequência") +
+  xlab("Retorno") #Alterar labels
+}
+```
+
+```{r}
+plot_histogram(df_dogecoin_ret, aes(return), "a")
+plot_histogram(df_stellar_ret, aes(return), "a")
+plot_histogram(df_xrp_ret, aes(return), "a")
+
+plot_histogram(df_dogecoin, aes(close), "a")
+plot_histogram(df_stellar, aes(close), "a")
+plot_histogram(df_xrp, aes(close), "a")
+```
+```{r}
+get_mode <- function(x) {
+  ux <- unique(round(x, digits = 2))
+  tab <- tabulate(match(x, ux))
+  ux[tab == max(tab)]
+}
+```
+
+```{r}
+display_info <- function(data) {
+  print(paste("Mean: ", mean(data)))
+  print(paste("Median: ", median(data)))
+  print(paste("Mode: ", get_mode(data)))
+  print(paste("Variance: ", sample_var(data)))
+  print(paste("Standard deviation: ", sample_stdev(data)))
+}
+```
+
+```{r}
+display_info(df_dogecoin_ret$return)
+display_info(df_stellar_ret$return)
+display_info(df_xrp_ret$return)
+```
+
+```{r}
+student_error <- function(data, alpha) {
+  n <- length(data)
+  t <- qt(1 - alpha, n - 1)
+  stdev <- sample_stdev(data)
+  return (t * stdev/sqrt(n))
+}
+```
+
+```{r}
+#TERMINAR OS ICs E (provavelmente) FAZER CHI²
+```

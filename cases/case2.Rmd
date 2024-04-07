@@ -78,7 +78,7 @@ display_info <-
 calculate_new_sample <- function(K, M) {
   generate_new_samples_measures(K, M)
   mean_of_sample_means <<- mean(samples_measures$mean)
-  mean_of_sample_var <<- mean(samples_measures$var)
+  mean_of_sample_vars <<- mean(samples_measures$var)
   display_info(K, M)
 }
 ```
