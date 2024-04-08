@@ -13,7 +13,7 @@ source("../utils.R")
 ```
 
 ```{r}
-df <- readRDS("cripto.rds")
+df <- readRDS("cases/cripto.rds")
 ```
 
 ```{r}
@@ -161,3 +161,120 @@ student_error <- function(data, alpha) {
 ```{r}
 #TERMINAR OS ICs E (provavelmente) FAZER CHI²
 ```
+
+```{r}
+df_dogecoin_ret_filtered = filter(df_dogecoin_ret, return > 0.025)
+```
+
+```{r}
+dogecoin_proportion = nrow(df_dogecoin_ret_filtered) / nrow(df_dogecoin_ret)
+dogecoin_proportion
+```
+
+```{r}
+proportion_error <- function(proportion, n, alpha) {
+  z <- qnorm(1 - alpha)
+  return (z * sqrt(proportion * (1 - proportion) / n))
+}
+```
+
+```{r}
+normal_graph <- function(mean, sd, error, title, xlabel, ylabel) {
+  x <- seq(-5 + mean, 5 + mean, by = .01)
+  y <- dnorm(x, mean = mean, sd = sd)
+  df_distr <- data.frame(x = x, y = y)
+  ggplot(df_distr, aes(x = x, y = y)) +
+    geom_point() +
+    ggtitle(title) +
+    xlab(xlabel) +
+    ylab(ylabel) +
+    geom_vline(xintercept = (mean - error)) +
+    geom_vline(xintercept = (mean + error))
+}
+```
+
+
+```{r}
+error <- proportion_error(dogecoin_proportion, nrow(df_dogecoin_ret), 0.025)
+paste("95% confidence error for Dogecoin:", round(error, 4))
+paste("95% confidence interval for Dogecoin:", round(dogecoin_proportion - error, 4), "~",round(dogecoin_proportion + error, 4))
+
+error <- proportion_error(dogecoin_proportion, nrow(df_dogecoin_ret), 0.05)
+paste("90% confidence error for Dogecoin:", round(error, 4))
+paste("90% confidence interval for Dogecoin:", round(dogecoin_proportion - error, 4), "~",round(dogecoin_proportion + error, 4))
+
+error <- proportion_error(dogecoin_proportion, nrow(df_dogecoin_ret), 0.005)
+paste("99% confidence error for Dogecoin:", round(error, 4))
+paste("99% confidence interval for Dogecoin:", round(dogecoin_proportion - error, 4), "~",round(dogecoin_proportion + error, 4))
+```
+
+```{r}
+dogecoin_var <- sample_var(df_dogecoin_ret$return)
+stellar_var <- sample_var(df_stellar_ret$return)
+xrp_var <- sample_var(df_xrp_ret$return)
+dogecoin_var
+```
+
+```{r}
+dogecoin_critical_value_a <- qchisq(0.025, nrow(df_dogecoin_ret) - 1)
+dogecoin_critical_value_b <- qchisq(0.975, nrow(df_dogecoin_ret) - 1)
+
+stellar_critical_value_a <- qchisq(0.025, nrow(df_stellar_ret) - 1)
+stellar_critical_value_b <- qchisq(0.975, nrow(df_stellar_ret) - 1)
+
+xrp_critical_value_a <- qchisq(0.025, nrow(df_xrp_ret) - 1)
+xrp_critical_value_b <- qchisq(0.975, nrow(df_xrp_ret) - 1)
+```
+
+```{r}
+dogecoin_interval <- c((nrow(df_dogecoin_ret) - 1) * dogecoin_var / dogecoin_critical_value_a, (nrow(df_dogecoin_ret) - 1) * dogecoin_var / dogecoin_critical_value_b)
+
+stellar_interval <- c((nrow(df_stellar_ret) - 1) * stellar_var / stellar_critical_value_a, (nrow(df_stellar_ret) - 1) * stellar_var / stellar_critical_value_b)
+
+xrp_interval <- c((nrow(df_xrp_ret) - 1) * xrp_var / xrp_critical_value_a, (nrow(df_xrp_ret) - 1) * xrp_var / xrp_critical_value_b)
+
+paste("95% confidence interval for Dogecoin:", round(dogecoin_interval[1], 6), "~", round(dogecoin_interval[2], 6))
+paste("95% confidence interval for Stellar:", round(stellar_interval[1], 6), "~", round(stellar_interval[2], 6))
+paste("95% confidence interval for XRP:", round(xrp_interval[1], 6), "~", round(xrp_interval[2], 6))
+```
+
+```{r}
+new_dogecoin_ret <- tail(df_dogecoin_ret, 20)
+new_stellar_ret <- tail(df_stellar_ret, 20)
+new_xrp_ret <- tail(df_xrp_ret, 20)
+```
+
+```{r}
+new_dogecoin_var <- sample_var(new_dogecoin_ret$return)
+new_stellar_var <- sample_var(new_stellar_ret$return)
+new_xrp_var <- sample_var(new_xrp_ret$return)
+```
+
+```{r}
+new_dogecoin_critical_value_a <- qchisq(0.025, nrow(new_dogecoin_ret) - 1)
+new_dogecoin_critical_value_b <- qchisq(0.975, nrow(new_dogecoin_ret) - 1)
+
+new_stellar_critical_value_a <- qchisq(0.025, nrow(new_stellar_ret) - 1)
+new_stellar_critical_value_b <- qchisq(0.975, nrow(new_stellar_ret) - 1)
+
+new_xrp_critical_value_a <- qchisq(0.025, nrow(new_xrp_ret) - 1)
+new_xrp_critical_value_b <- qchisq(0.975, nrow(new_xrp_ret) - 1)
+```
+
+```{r}
+new_dogecoin_interval <- c((nrow(new_dogecoin_ret) - 1) * new_dogecoin_var / new_dogecoin_critical_value_a, (nrow(new_dogecoin_ret) - 1) * new_dogecoin_var / new_dogecoin_critical_value_b)
+
+new_stellar_interval <- c((nrow(new_stellar_ret) - 1) * new_stellar_var / new_stellar_critical_value_a, (nrow(new_stellar_ret) - 1) * new_stellar_var / new_stellar_critical_value_b)
+
+new_xrp_interval <- c((nrow(new_xrp_ret) - 1) * new_xrp_var / new_xrp_critical_value_a, (nrow(new_xrp_ret) - 1) * new_xrp_var / new_xrp_critical_value_b)
+
+paste("95% confidence interval for Dogecoin:", round(new_dogecoin_interval[1], 6), "~", round(new_dogecoin_interval[2], 6))
+paste("95% confidence interval for Stellar:", round(new_stellar_interval[1], 6), "~", round(new_stellar_interval[2], 6))
+paste("95% confidence interval for XRP:", round(new_xrp_interval[1], 6), "~", round(new_xrp_interval[2], 6))
+```
+
+```{r}
+```
+
+
+
