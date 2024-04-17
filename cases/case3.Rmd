@@ -43,12 +43,6 @@ ggplot(df_xrp, aes(x=date, y=close)) +
 ```
 
 ```{r}
-calc_return = function(data) {
-  
-}
-```
-
-```{r}
 calc_returns = function(data) {
   for(i in 2:nrow(data)) {
     data$return[i] = log(data$close[i] / data$close[i-1])

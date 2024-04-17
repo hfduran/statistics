@@ -1,0 +1,336 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+install.packages("tidyverse")
+install.packages("ggplot2")
+library(tidyverse)
+library(ggplot2)
+source("../utils.R")
+```
+
+```{r}
+df <- readRDS("cripto.rds")
+```
+
+```{r}
+df_dogecoin = subset(df, name=="Dogecoin")
+df_stellar = subset(df, name=="Stellar")
+df_xrp = subset(df, name=="XRP")
+```
+
+```{r}
+calc_returns = function(data) {
+  for(i in 2:nrow(data)) {
+    data$return[i] = log(data$close[i] / data$close[i-1])
+  }
+  
+  clean_data = data[-1,]
+  
+  return (clean_data)
+}
+```
+
+```{r}
+df_dogecoin$return = 0
+df_stellar$return = 0
+df_xrp$return = 0
+
+df_dogecoin_ret = calc_returns(df_dogecoin)
+df_stellar_ret = calc_returns(df_stellar)
+df_xrp_ret = calc_returns(df_xrp)
+```
+
+#NEW VERSION
+```{r}
+normal_error <- function(alpha, n, pop_stdev) {
+  z <- qnorm(1 - alpha)
+  stdev <- pop_stdev
+  return (z * stdev/sqrt(n))
+}
+```
+
+```{r}
+student_error <- function(data, alpha) {
+  n <- length(data)
+  t <- qt(1 - alpha, n - 1)
+  stdev <- sample_stdev(data)
+  return (t * stdev/sqrt(n))
+}
+```
+
+```{r}
+normal_graph <- function(mean, sd, error, title, xlabel, ylabel) {
+  x <- seq(-0.01 + mean, 0.01 + mean, by = .00001)
+  y <- dnorm(x, mean = mean, sd = sd)
+  df_distr <- data.frame(x = x, y = y)
+  ggplot(df_distr, aes(x = x, y = y)) +
+    geom_point() +
+    ggtitle(title) +
+    xlab(xlabel) +
+    ylab(ylabel) +
+    geom_vline(xintercept = (mean - error)) +
+    geom_vline(xintercept = (mean + error))
+}
+```
+
+#Normal - 95%
+```{r}
+dogecoin_ret_mean = mean(df_dogecoin_ret$return)
+stellar_ret_mean = mean(df_stellar_ret$return)
+xrp_ret_mean = mean(df_xrp_ret$return)
+
+dogecoin_ret_sd = 0.020
+stellar_ret_sd = 0.015
+xrp_ret_sd = 0.012
+
+dogecoin_ret_mean_error = normal_error(0.025, length(df_dogecoin_ret$return), dogecoin_ret_sd)
+stellar_ret_mean_error = normal_error(0.025, length(df_stellar_ret$return), stellar_ret_sd)
+xrp_ret_mean_error = normal_error(0.025, length(df_xrp_ret$return), xrp_ret_sd)
+
+print(paste(
+  "Mean confidence interval for Dogecoin returns (95%):",
+  "[",
+  round(dogecoin_ret_mean - dogecoin_ret_mean_error, 8),
+  ";",
+  round(dogecoin_ret_mean + dogecoin_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for Stellar returns (95%):",
+  "[",
+  round(stellar_ret_mean - stellar_ret_mean_error, 8),
+  ";",
+  round(stellar_ret_mean + stellar_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for XRP returns (95%):",
+  "[",
+  round(xrp_ret_mean - xrp_ret_mean_error, 8),
+  ";",
+  round(xrp_ret_mean + xrp_ret_mean_error, 8),
+  "]"
+))
+
+normal_graph(dogecoin_ret_mean, dogecoin_ret_sd, dogecoin_ret_mean_error, "Intervalo de Confiança para Retorno de Dogecoin (95%)", "Retorno", "Densidade de Probabilidade")
+
+normal_graph(stellar_ret_mean, stellar_ret_sd, stellar_ret_mean_error, "Intervalo de Confiança para Retorno de Stellar (95%)", "Retorno", "Densidade de Probabilidade")
+
+normal_graph(xrp_ret_mean, xrp_ret_sd, xrp_ret_mean_error, "Intervalo de Confiança para Retorno de XRP (95%)", "Retorno", "Densidade de Probabilidade")
+```
+
+#Normal - 90%
+```{r}
+dogecoin_ret_mean = mean(df_dogecoin_ret$return)
+stellar_ret_mean = mean(df_stellar_ret$return)
+xrp_ret_mean = mean(df_xrp_ret$return)
+
+dogecoin_ret_sd = 0.020
+stellar_ret_sd = 0.015
+xrp_ret_sd = 0.012
+
+dogecoin_ret_mean_error = normal_error(0.05, length(df_dogecoin_ret$return), dogecoin_ret_sd)
+stellar_ret_mean_error = normal_error(0.05, length(df_stellar_ret$return), stellar_ret_sd)
+xrp_ret_mean_error = normal_error(0.05, length(df_xrp_ret$return), xrp_ret_sd)
+
+print(paste(
+  "Mean confidence interval for Dogecoin returns (90%):",
+  "[",
+  round(dogecoin_ret_mean - dogecoin_ret_mean_error, 8),
+  ";",
+  round(dogecoin_ret_mean + dogecoin_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for Stellar returns (90%):",
+  "[",
+  round(stellar_ret_mean - stellar_ret_mean_error, 8),
+  ";",
+  round(stellar_ret_mean + stellar_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for XRP returns (90%):",
+  "[",
+  round(xrp_ret_mean - xrp_ret_mean_error, 8),
+  ";",
+  round(xrp_ret_mean + xrp_ret_mean_error, 8),
+  "]"
+))
+
+normal_graph(dogecoin_ret_mean, dogecoin_ret_sd, dogecoin_ret_mean_error, "Intervalo de Confiança para Retorno de Dogecoin (90%)", "Retorno", "Densidade de Probabilidade")
+
+normal_graph(stellar_ret_mean, stellar_ret_sd, stellar_ret_mean_error, "Intervalo de Confiança para Retorno de Stellar (90%)", "Retorno", "Densidade de Probabilidade")
+
+normal_graph(xrp_ret_mean, xrp_ret_sd, xrp_ret_mean_error, "Intervalo de Confiança para Retorno de XRP (90%)", "Retorno", "Densidade de Probabilidade")
+```
+
+#Normal - 99%
+```{r}
+dogecoin_ret_mean = mean(df_dogecoin_ret$return)
+stellar_ret_mean = mean(df_stellar_ret$return)
+xrp_ret_mean = mean(df_xrp_ret$return)
+
+dogecoin_ret_sd = 0.020
+stellar_ret_sd = 0.015
+xrp_ret_sd = 0.012
+
+dogecoin_ret_mean_error = normal_error(0.005, length(df_dogecoin_ret$return), dogecoin_ret_sd)
+stellar_ret_mean_error = normal_error(0.005, length(df_stellar_ret$return), stellar_ret_sd)
+xrp_ret_mean_error = normal_error(0.005, length(df_xrp_ret$return), xrp_ret_sd)
+
+print(paste(
+  "Mean confidence interval for Dogecoin returns (99%):",
+  "[",
+  round(dogecoin_ret_mean - dogecoin_ret_mean_error, 8),
+  ";",
+  round(dogecoin_ret_mean + dogecoin_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for Stellar returns (99%):",
+  "[",
+  round(stellar_ret_mean - stellar_ret_mean_error, 8),
+  ";",
+  round(stellar_ret_mean + stellar_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for XRP returns (99%):",
+  "[",
+  round(xrp_ret_mean - xrp_ret_mean_error, 8),
+  ";",
+  round(xrp_ret_mean + xrp_ret_mean_error, 8),
+  "]"
+))
+
+normal_graph(dogecoin_ret_mean, dogecoin_ret_sd, dogecoin_ret_mean_error, "Intervalo de Confiança para Retorno de Dogecoin (99%)", "Retorno", "Densidade de Probabilidade")
+
+normal_graph(stellar_ret_mean, stellar_ret_sd, stellar_ret_mean_error, "Intervalo de Confiança para Retorno de Stellar (99%)", "Retorno", "Densidade de Probabilidade")
+
+normal_graph(xrp_ret_mean, xrp_ret_sd, xrp_ret_mean_error, "Intervalo de Confiança para Retorno de XRP (99%)", "Retorno", "Densidade de Probabilidade")
+```
+
+#Student - 95%
+```{r}
+dogecoin_ret_mean = mean(df_dogecoin_ret$return)
+stellar_ret_mean = mean(df_stellar_ret$return)
+xrp_ret_mean = mean(df_xrp_ret$return)
+
+dogecoin_ret_mean_error = student_error(df_dogecoin_ret$return, 0.025)
+stellar_ret_mean_error = student_error(df_stellar_ret$return, 0.025)
+xrp_ret_mean_error = student_error(df_xrp_ret$return, 0.025)
+
+print(paste(
+  "Mean confidence interval for Dogecoin returns (95%):",
+  "[",
+  round(dogecoin_ret_mean - dogecoin_ret_mean_error, 8),
+  ";",
+  round(dogecoin_ret_mean + dogecoin_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for Stellar returns (95%):",
+  "[",
+  round(stellar_ret_mean - stellar_ret_mean_error, 8),
+  ";",
+  round(stellar_ret_mean + stellar_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for XRP returns (95%):",
+  "[",
+  round(xrp_ret_mean - xrp_ret_mean_error, 8),
+  ";",
+  round(xrp_ret_mean + xrp_ret_mean_error, 8),
+  "]"
+))
+```
+
+#Student - 90%
+```{r}
+dogecoin_ret_mean = mean(df_dogecoin_ret$return)
+stellar_ret_mean = mean(df_stellar_ret$return)
+xrp_ret_mean = mean(df_xrp_ret$return)
+
+dogecoin_ret_mean_error = student_error(df_dogecoin_ret$return, 0.05)
+stellar_ret_mean_error = student_error(df_stellar_ret$return, 0.05)
+xrp_ret_mean_error = student_error(df_xrp_ret$return, 0.05)
+
+print(paste(
+  "Mean confidence interval for Dogecoin returns (90%):",
+  "[",
+  round(dogecoin_ret_mean - dogecoin_ret_mean_error, 8),
+  ";",
+  round(dogecoin_ret_mean + dogecoin_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for Stellar returns (90%):",
+  "[",
+  round(stellar_ret_mean - stellar_ret_mean_error, 8),
+  ";",
+  round(stellar_ret_mean + stellar_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for XRP returns (90%):",
+  "[",
+  round(xrp_ret_mean - xrp_ret_mean_error, 8),
+  ";",
+  round(xrp_ret_mean + xrp_ret_mean_error, 8),
+  "]"
+))
+```
+
+#Student - 99%
+```{r}
+dogecoin_ret_mean = mean(df_dogecoin_ret$return)
+stellar_ret_mean = mean(df_stellar_ret$return)
+xrp_ret_mean = mean(df_xrp_ret$return)
+
+dogecoin_ret_mean_error = student_error(df_dogecoin_ret$return, 0.005)
+stellar_ret_mean_error = student_error(df_stellar_ret$return, 0.005)
+xrp_ret_mean_error = student_error(df_xrp_ret$return, 0.005)
+
+print(paste(
+  "Mean confidence interval for Dogecoin returns (99%):",
+  "[",
+  round(dogecoin_ret_mean - dogecoin_ret_mean_error, 8),
+  ";",
+  round(dogecoin_ret_mean + dogecoin_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for Stellar returns (99%):",
+  "[",
+  round(stellar_ret_mean - stellar_ret_mean_error, 8),
+  ";",
+  round(stellar_ret_mean + stellar_ret_mean_error, 8),
+  "]"
+))
+
+print(paste(
+  "Mean confidence interval for XRP returns (99%):",
+  "[",
+  round(xrp_ret_mean - xrp_ret_mean_error, 8),
+  ";",
+  round(xrp_ret_mean + xrp_ret_mean_error, 8),
+  "]"
+))
+```
