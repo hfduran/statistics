@@ -1,21 +1,25 @@
 ---
-output:
-  pdf_document: default
-  html_document: default
+title: "case4"
+format: pdf
+editor: visual
 ---
 
-```{r}
-#install.packages("tidyverse")
-#install.packages("ggplot2")
-```
+# Case 4
 
+Aluno: Henrique Fuga Duran
+
+Nusp: 12553570
+
+```{r}
+install.packages("tidyverse")
+install.packages("ggplot2")
+```
 
 ```{r}
 library(tidyverse)
 library(ggplot2)
 source("../utils.R")
 ```
-
 
 ```{r}
 df <- readRDS("cripto.rds")
@@ -50,6 +54,7 @@ df_xrp_ret = calc_returns(df_xrp)
 ```
 
 #NEW VERSION
+
 ```{r}
 normal_error <- function(alpha, n, pop_stdev) {
   z <- qnorm(1 - alpha)
@@ -83,6 +88,7 @@ normal_graph <- function(mean, sd, error, title, xlabel, ylabel) {
 ```
 
 #Normal - 95%
+
 ```{r}
 dogecoin_ret_mean = mean(df_dogecoin_ret$return)
 stellar_ret_mean = mean(df_stellar_ret$return)
@@ -131,6 +137,7 @@ normal_graph(xrp_ret_mean, xrp_ret_sd, xrp_ret_mean_error, "Intervalo de Confian
 ```
 
 #Normal - 90%
+
 ```{r}
 dogecoin_ret_mean = mean(df_dogecoin_ret$return)
 stellar_ret_mean = mean(df_stellar_ret$return)
@@ -179,6 +186,7 @@ normal_graph(xrp_ret_mean, xrp_ret_sd, xrp_ret_mean_error, "Intervalo de Confian
 ```
 
 #Normal - 99%
+
 ```{r}
 dogecoin_ret_mean = mean(df_dogecoin_ret$return)
 stellar_ret_mean = mean(df_stellar_ret$return)
@@ -227,6 +235,7 @@ normal_graph(xrp_ret_mean, xrp_ret_sd, xrp_ret_mean_error, "Intervalo de Confian
 ```
 
 #Student - 95%
+
 ```{r}
 dogecoin_ret_mean = mean(df_dogecoin_ret$return)
 stellar_ret_mean = mean(df_stellar_ret$return)
@@ -265,6 +274,7 @@ print(paste(
 ```
 
 #Student - 90%
+
 ```{r}
 dogecoin_ret_mean = mean(df_dogecoin_ret$return)
 stellar_ret_mean = mean(df_stellar_ret$return)
@@ -303,6 +313,7 @@ print(paste(
 ```
 
 #Student - 99%
+
 ```{r}
 dogecoin_ret_mean = mean(df_dogecoin_ret$return)
 stellar_ret_mean = mean(df_stellar_ret$return)
@@ -339,49 +350,3 @@ print(paste(
   "]"
 ))
 ```
-
-# Intervalo de confiança dois parametros
-
-## Variancias conhecidas
-```{r}
-xrp_var <- 0.02
-stellar_var <- 0.012
-
-xrp_mean <- mean(df_xrp_ret$return)
-stellar_mean <- mean(df_stellar_ret$return)
-diff_mean <- xrp_mean - stellar_mean
-
-crit <- qnorm(0.025)
-
-error <- sqrt(xrp_var/length(df_xrp_ret$return) + stellar_var/length(df_stellar_ret$return))
-
-print(paste("Intervalo de confiança para diferença entre a média dos retornos para XRP e Stellar", round(diff_mean - crit * error, 8), "~", round(diff_mean + crit * error, 8)))
-
-normal_graph(diff_mean, error, crit * error, "Intervalo de confiança para diferença entre a média dos retornos para XRP e Stellar", "Retorno", "Densidade de Probabilidade")
-```
-## Variancias desconhecidas mas iguais
-```{r}
-xrp_sample_var <- sample_var(df_xrp_ret$return)
-stellar_sample_var <- sample_var(df_stellar_ret$return)
-
-n_xrp <- length(df_xrp_ret$return)
-n_stellar <- length(df_stellar_ret$return)
-
-variance_stimator <- ((n_xrp - 1) * xrp_sample_var + (n_stellar - 1) * stellar_sample_var) / (n_xrp + n_stellar - 2)
-
-critical_value <- qt(0.975, n_xrp + n_stellar - 2)
-error <- sqrt(variance_stimator/n_xrp + variance_stimator/n_stellar)
-
-diff_mean <- xrp_mean - stellar_mean
-
-print(paste("Intervalo de confiança para diferença entre a média dos retornos para XRP e Stellar", round(diff_mean - critical_value * error, 8), "~", round(diff_mean + critical_value * error, 8)))
-```
-
-## Variancias desconhecidas e podem ser diferentes
-```{r}
-critical_value <- qt(0.975, n_xrp + n_stellar - 2)
-error <- sqrt(xrp_sample_var/length(df_xrp_ret$return) + stellar_sample_var/length(df_stellar_ret$return))
-
-
-```
-
