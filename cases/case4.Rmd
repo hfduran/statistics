@@ -351,13 +351,13 @@ xrp_mean <- mean(df_xrp_ret$return)
 stellar_mean <- mean(df_stellar_ret$return)
 diff_mean <- xrp_mean - stellar_mean
 
-crit <- qnorm(0.025)
+crit <- qnorm(0.975)
 
 error <- sqrt(xrp_var/length(df_xrp_ret$return) + stellar_var/length(df_stellar_ret$return))
 
-print(paste("Intervalo de confiança para diferença entre a média dos retornos para XRP e Stellar", round(diff_mean - crit * error, 8), "~", round(diff_mean + crit * error, 8)))
+print(paste("Intervalo de confiança para diferença entre a média dos retornos para XRP e Stellar - variancias conhecidas", round(diff_mean - crit * error, 8), "~", round(diff_mean + crit * error, 8)))
 
-normal_graph(diff_mean, error, crit * error, "Intervalo de confiança para diferença entre a média dos retornos para XRP e Stellar", "Retorno", "Densidade de Probabilidade")
+normal_graph(diff_mean, error, crit * error, "Intervalo de confiança: variâncias conhecidas", "Retorno", "Densidade de Probabilidade")
 ```
 ## Variancias desconhecidas mas iguais
 ```{r}
@@ -374,7 +374,9 @@ error <- sqrt(variance_stimator/n_xrp + variance_stimator/n_stellar)
 
 diff_mean <- xrp_mean - stellar_mean
 
-print(paste("Intervalo de confiança para diferença entre a média dos retornos para XRP e Stellar", round(diff_mean - critical_value * error, 8), "~", round(diff_mean + critical_value * error, 8)))
+print(paste("Intervalo de confiança para diferença entre a média dos retornos para XRP e Stellar - variâncias desconhecidas e iguais", round(diff_mean - critical_value * error, 8), "~", round(diff_mean + critical_value * error, 8)))
+
+normal_graph(diff_mean, error, critical_value * error, "Intervalo de Confiança: variancias desconhecidas iguais", "Retorno", "Densidade de Probabilidade")
 ```
 
 ## Variancias desconhecidas e podem ser diferentes
@@ -382,6 +384,11 @@ print(paste("Intervalo de confiança para diferença entre a média dos retornos
 critical_value <- qt(0.975, n_xrp + n_stellar - 2)
 error <- sqrt(xrp_sample_var/length(df_xrp_ret$return) + stellar_sample_var/length(df_stellar_ret$return))
 
+confiance_interval <- c(diff_mean - critical_value * error, diff_mean + critical_value * error)
+
+print(paste("Intervalo de confiança para diferença entre a média dos retornos para XRP e Stellar", round(confiance_interval[1], 8), "~", round(confiance_interval[2], 8)))
+# 
+normal_graph(diff_mean, error, critical_value * error, "Intervalo de confiança para diferença entre a média dos retornos para XRP e Stellar", "Retorno", "Densidade de Probabilidade")
 
 ```
 
