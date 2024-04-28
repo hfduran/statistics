@@ -78,3 +78,34 @@ dortmund_goal_crit = dortmund_goal_error + 2.6
 
 print_test("<", dortmund_goal_mean, dortmund_goal_crit)
 ```
+
+#Teste de Hipótese - t-Student 95%
+```{r}
+dortmund_goal_mean = mean(df_dortmund$FullTimeHomeGoals)
+dortmund_goal_error = (-1) * student_error(df_dortmund$FullTimeHomeGoals, 0.05)
+
+dortmund_goal_crit = dortmund_goal_error + 2.6
+
+print_test("<", dortmund_goal_mean, dortmund_goal_crit)
+```
+
+#Teste de Hipótese - Normal 99%
+```{r}
+dortmund_goal_sd = 0.5
+dortmund_goal_mean = mean(df_dortmund$FullTimeHomeGoals)
+dortmund_goal_error = (-1) * normal_error(0.01, length(df_dortmund$FullTimeHomeGoals), dortmund_goal_sd)
+
+dortmund_goal_crit = dortmund_goal_error + 2.6
+
+print_test("<", dortmund_goal_mean, dortmund_goal_crit)
+```
+
+#Teste de Hipótese - t-Student 99%
+```{r}
+dortmund_goal_mean = mean(df_dortmund$FullTimeHomeGoals)
+dortmund_goal_error = (-1) * student_error(df_dortmund$FullTimeHomeGoals, 0.01)
+
+dortmund_goal_crit = dortmund_goal_error + 2.6
+
+print_test("<", dortmund_goal_mean, dortmund_goal_crit)
+```
