@@ -47,3 +47,114 @@ print(summary(dortmund_goals_home))
 print(summary(dortmund_goals_away))
 ```
 
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+install.packages("tidyverse")
+install.packages("ggplot2")
+library(tidyverse)
+library(ggplot2)
+source("../utils.R")
+```
+
+```{r}
+df <- readRDS("bundesliga.rds")
+df_dortmund = subset(df, HomeTeam=="Dortmund")
+```
+
+```{r}
+normal_error <- function(alpha, n, pop_stdev) {
+  z <- qnorm(1 - alpha)
+  stdev <- pop_stdev
+  return (z * stdev/sqrt(n))
+}
+```
+
+```{r}
+student_error <- function(data, alpha) {
+  n <- length(data)
+  t <- qt(1 - alpha, n - 1)
+  stdev <- sample_stdev(data)
+  return (t * stdev/sqrt(n))
+}
+```
+
+```{r}
+print_test <- function(test, sample_value, crit_value, crit_value2=NULL) {
+  if(test == ">") {
+    if(sample_value > crit_value) {
+      print(paste("REJECT H0 - ", sample_value, " > ", crit_value))
+    }
+    
+    else {
+      print(paste("ACCEPT H0 - ", sample_value, " <= ", crit_value))
+    }
+  }
+  
+  else if(test == "<") {
+    if(sample_value < crit_value) {
+      print(paste("REJECT H0 - ", sample_value, " < ", crit_value))
+    }
+    
+    else {
+      print(paste("ACCEPT H0 - ", sample_value, " >= ", crit_value))
+    }
+  }
+  
+  else if(test == "!=" && !is.null(crit_value2)) {
+    if(sample_value < crit_value || sample_value > crit_value2) {
+      print(paste("REJECT H0 - ", sample_value, " is not between ", crit_value, " and ", crit_value2))
+    }
+    
+    else {
+      print(paste("ACCEPT H0 - ", crit_value, " <= ", sample_value, " <= ", crit_value2))
+    }
+  }
+}
+```
+
+#Teste de Hipótese - Normal 95%
+```{r}
+dortmund_goal_sd = 0.5
+dortmund_goal_mean = mean(df_dortmund$FullTimeHomeGoals)
+dortmund_goal_error = (-1) * normal_error(0.05, length(df_dortmund$FullTimeHomeGoals), dortmund_goal_sd)
+
+dortmund_goal_crit = dortmund_goal_error + 2.6
+
+print_test("<", dortmund_goal_mean, dortmund_goal_crit)
+```
+
+#Teste de Hipótese - t-Student 95%
+```{r}
+dortmund_goal_mean = mean(df_dortmund$FullTimeHomeGoals)
+dortmund_goal_error = (-1) * student_error(df_dortmund$FullTimeHomeGoals, 0.05)
+
+dortmund_goal_crit = dortmund_goal_error + 2.6
+
+print_test("<", dortmund_goal_mean, dortmund_goal_crit)
+```
+
+#Teste de Hipótese - Normal 99%
+```{r}
+dortmund_goal_sd = 0.5
+dortmund_goal_mean = mean(df_dortmund$FullTimeHomeGoals)
+dortmund_goal_error = (-1) * normal_error(0.01, length(df_dortmund$FullTimeHomeGoals), dortmund_goal_sd)
+
+dortmund_goal_crit = dortmund_goal_error + 2.6
+
+print_test("<", dortmund_goal_mean, dortmund_goal_crit)
+```
+
+#Teste de Hipótese - t-Student 99%
+```{r}
+dortmund_goal_mean = mean(df_dortmund$FullTimeHomeGoals)
+dortmund_goal_error = (-1) * student_error(df_dortmund$FullTimeHomeGoals, 0.01)
+
+dortmund_goal_crit = dortmund_goal_error + 2.6
+
+print_test("<", dortmund_goal_mean, dortmund_goal_crit)
+```
