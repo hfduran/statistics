@@ -1,3 +1,52 @@
+```{r}
+library(ggplot2)
+```
+
+
+```{r}
+bundesliga <- readRDS("bundesliga.rds")
+```
+
+
+```{r separating-dortmund-data}
+dortmund_home_df <- subset(bundesliga, HomeTeam == "Dortmund")
+dortmund_away_df <- subset(bundesliga, AwayTeam == "Dortmund")
+
+dortmund_goals_home <- dortmund_home_df$FullTimeHomeGoals
+dortmund_goals_away <- dortmund_away_df$FullTimeAwayGoals
+```
+
+
+```{r boxplot}
+
+data1 <- data.frame(
+  Group = rep("Em casa", length(dortmund_goals_home)),
+  Value = dortmund_goals_home
+)
+
+data2 <- data.frame(
+  Group = rep("Fora de casa", length(dortmund_goals_away)),
+  Value = dortmund_goals_away
+)
+
+# Combine data frames
+data <- rbind(data1, data2)
+
+# Create the boxplot
+ggplot(data, aes(x = Group, y = Value, fill = Group)) +
+  geom_boxplot() +
+  labs(title = "Side-by-Side Boxplot",
+       x = "Group",
+       y = "Value")
+```
+
+```{r dortmund-summary}
+"Em casa:"
+print(summary(dortmund_goals_home))
+"Fora de casa:"
+print(summary(dortmund_goals_away))
+```
+
 ---
 output:
   pdf_document: default
