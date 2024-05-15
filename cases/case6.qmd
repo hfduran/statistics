@@ -1,0 +1,55 @@
+Henrique Fuga Duran
+12553570
+
+```{r}
+bundesliga <- readRDS("bundesliga.rds")
+```
+
+
+```{r separating-dortmund-data}
+dortmund_home_df <- subset(bundesliga, HomeTeam == "Dortmund")
+home_conceded_goals = dortmund_home_df$FullTimeAwayGoals
+```
+
+## stdev populacional conhecido
+```{r}
+pop_stdev <- 0.982
+alpha <- 0.05
+n <- length(home_conceded_goals)
+z <- qnorm(1 - alpha/2)
+stdev <- pop_stdev
+error <- z * stdev/sqrt(n)
+error
+```
+
+```{r}
+mean_home_conceded_goals <- mean(home_conceded_goals)
+mean_home_conceded_goals
+```
+
+```{r}
+crit = 1 + error
+crit
+```
+
+## stdev populacional desconhecido
+```{r}
+alpha <- 0.05
+n <- length(home_conceded_goals)
+t <- qt(1 - alpha/2, n - 1)
+stdev <- sd(home_conceded_goals)
+error <- t * stdev/sqrt(n)
+error
+```
+
+
+```{r}
+crit = 1 + error
+crit
+```
+
+```{r}
+b = qchisq(0.95, n - 1)
+b
+```
+
