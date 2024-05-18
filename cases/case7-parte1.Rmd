@@ -1,0 +1,81 @@
+Aluno: Henrique Fuga Duran
+NUSP: 12553570
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+source("../utils.R")
+```
+
+```{r}
+df <- readRDS("bundesliga.rds")
+df_home = subset(df, HomeTeam=="Dortmund")
+df_away = subset(df, AwayTeam=="Dortmund")
+home_taken_goals <- df_home$FullTimeAwayGoals
+away_taken_goals <- df_away$FullTimeHomeGoals
+```
+
+Jornalista: xm - ym = diff = 0
+
+ - H0: diff = 0
+ - H1: diff != 0
+
+```{r}
+alpha <- 0.05
+mean_home_taken_goals <- mean(home_taken_goals)
+mean_away_taken_goals <- mean(away_taken_goals)
+diff <- mean_home_taken_goals - mean_away_taken_goals
+diff
+```
+
+## Desvio padrão conhecido
+
+```{r}
+sd_home_taken_goals <- 0.982
+sd_away_taken_goals <- 1.183
+
+z <- qnorm(1 - alpha/2)
+error <- z * sqrt((sd_home_taken_goals^2)/length(home_taken_goals) + (sd_away_taken_goals^2)/length(away_taken_goals))
+error
+```
+
+```{r}
+print_test("!=",
+           diff,-error,
+           error)
+
+```
+
+## Desvio padrão desconhecido e igual
+
+```{r}
+var_p <-
+  (
+    ((length(home_taken_goals) - 1) * var(home_taken_goals)) +
+    ((length(away_taken_goals) - 1) * var(away_taken_goals))
+  ) / (length(home_taken_goals) + length(away_taken_goals) - 2)
+
+t <- qt(1 - alpha/2, length(home_taken_goals) + length(away_taken_goals) - 2)
+
+crit <- t * sqrt(var_p * (1/length(home_taken_goals) + 1/length(away_taken_goals)))
+```
+
+```{r}
+print_test("!=",
+           diff,-crit,
+           crit)
+```
+
+## Desvio padrão desconhecido e diferentes
+```{r}
+t <- qt(1 - alpha/2, length(home_taken_goals) + length(away_taken_goals) - 2)
+
+crit <- t * sqrt((var(home_taken_goals)/length(home_taken_goals)) + (var(away_taken_goals)/length(away_taken_goals)))
+```
+
+```{r}
+print_test("!=",
+           diff,-crit,
+           crit)
+```
+
