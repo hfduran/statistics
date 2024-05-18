@@ -1,0 +1,95 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+install.packages("tidyverse")
+install.packages("ggplot2")
+library(tidyverse)
+library(ggplot2)
+source("../utils.R")
+```
+
+```{r}
+df <- readRDS("bundesliga.rds")
+df_dortmund_home = subset(df, HomeTeam=="Dortmund")
+df_dortmund_away = subset(df, AwayTeam=="Dortmund")
+```
+
+```{r}
+normal_error <- function(alpha, n, pop_stdev) {
+  z <- qnorm(1 - alpha)
+  stdev <- pop_stdev
+  return (z * stdev/sqrt(n))
+}
+```
+
+```{r}
+student_error <- function(data, alpha) {
+  n <- length(data)
+  t <- qt(1 - alpha, n - 1)
+  stdev <- sample_stdev(data)
+  return (t * stdev/sqrt(n))
+}
+```
+
+```{r}
+chi_error <- function(data, alpha) {
+  n <- length(data)
+  chi <- qchisq(1 - alpha, n - 1)
+  return (chi / (n - 1))
+}
+```
+
+```{r}
+snedecor_error <- function(len1, len2, alpha) {
+  return (qf(alpha, df1=len1, df2=len2))
+}
+```
+
+```{r}
+print_test <- function(test, sample_value, crit_value, crit_value2=NULL) {
+  if(test == ">") {
+    if(sample_value > crit_value) {
+      print(paste("REJECT H0 - ", sample_value, " > ", crit_value))
+    }
+    
+    else {
+      print(paste("ACCEPT H0 - ", sample_value, " <= ", crit_value))
+    }
+  }
+  
+  else if(test == "<") {
+    if(sample_value < crit_value) {
+      print(paste("REJECT H0 - ", sample_value, " < ", crit_value))
+    }
+    
+    else {
+      print(paste("ACCEPT H0 - ", sample_value, " >= ", crit_value))
+    }
+  }
+  
+  else if(test == "!=" && !is.null(crit_value2)) {
+    if(sample_value < crit_value || sample_value > crit_value2) {
+      print(paste("REJECT H0 - ", sample_value, " is not between ", crit_value, " and ", crit_value2))
+    }
+    
+    else {
+      print(paste("ACCEPT H0 - ", crit_value, " <= ", sample_value, " <= ", crit_value2))
+    }
+  }
+}
+```
+
+#Teste de Hipótese - f-Snedecor 95%
+```{r}
+dortmund_goal_home_var = sample_var(df_dortmund_home$FullTimeAwayGoals)
+dortmund_goal_away_var = sample_var(df_dortmund_away$FullTimeHomeGoals)
+
+dortmund_goal_crit = snedecor_error(length(df_dortmund_home$FullTimeAwayGoals), length(df_dortmund_away$FullTimeHomeGoals), 0.05)
+
+print_test(">", (dortmund_goal_home_var / dortmund_goal_away_var), dortmund_goal_crit)
+print_test(">", (dortmund_goal_away_var / dortmund_goal_home_var), dortmund_goal_crit)
+```
