@@ -1,56 +1,55 @@
 ---
 output:
-  pdf_document: default
-  html_document: default
+pdf_document: default
+html_document: default
 ---
-
 ```{r}
-install.packages("tidyverse")
-install.packages("ggplot2")
-library(tidyverse)
-library(ggplot2)
-source("../utils.R")
+  install.packages("tidyverse")
+  install.packages("ggplot2")
+  library(tidyverse)
+  library(ggplot2)
+  source("../utils.R")
 ```
 
 ```{r}
-df <- readRDS("tratamento.rds")
+  df <- readRDS("tratamento.rds")
 ```
 
 ```{r separating-dortmund-data}
-dortmund_home_df <- subset(bundesliga, HomeTeam == "Dortmund")
-dortmund_away_df <- subset(bundesliga, AwayTeam == "Dortmund")
-
-dortmund_goals_home <- dortmund_home_df$FullTimeHomeGoals
-dortmund_goals_away <- dortmund_away_df$FullTimeAwayGoals
+  gf_df <- subset(df, MEIO == "GF")
+  gc_df <- subset(df, MEIO == "GC")
+  lj_df <- subset(df, MEIO == "LJ")
+  cresc_gf <- gf_df$CRESCIMENTO
+  cresc_gc <- gc_df$CRESCIMENTO
+  cresc_lj <- lj_df$CRESCIMENTO
 ```
 
-
 ```{r boxplot}
-
-data1 <- data.frame(
-  Group = rep("Em casa", length(dortmund_goals_home)),
-  Value = dortmund_goals_home
-)
-
-data2 <- data.frame(
-  Group = rep("Fora de casa", length(dortmund_goals_away)),
-  Value = dortmund_goals_away
-)
-
-# Combine data frames
-data <- rbind(data1, data2)
-
-# Create the boxplot
-ggplot(data, aes(x = Group, y = Value, fill = Group)) +
+  data1 <- data.frame(
+    Group = rep("Crescimento - Gema Fresca", length(cresc_gf)),
+    Value = cresc_gf
+  )
+  data2 <- data.frame(
+    Group = rep("Crescimento - Gema Comercial", length(cresc_gc)),
+    Value = cresc_gc
+  )
+  data3 <- data.frame(
+    Group = rep("Crescimento - Low Jeinsen", length(cresc_lj)),
+    Value = cresc_lj
+  )
+  # Combine data frames
+  data <- rbind(data1, data2, data3)
+  # Create the boxplot
+  ggplot(data, aes(x = Group, y = Value, fill = Group)) +
   geom_boxplot() +
   labs(title = "Side-by-Side Boxplot",
-       x = "Group",
-       y = "Value")
+  x = "Group",
+  y = "Value") +
+  ylim(0, 2.5)
 ```
 
 ```{r dortmund-summary}
-"Em casa:"
-print(summary(dortmund_goals_home))
-"Fora de casa:"
-print(summary(dortmund_goals_away))
+  print(summary(cresc_gf))
+  print(summary(cresc_gc))
+  print(summary(cresc_lj))
 ```
