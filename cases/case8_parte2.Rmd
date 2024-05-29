@@ -1,0 +1,17 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+install.packages("tidyverse")
+install.packages("ggplot2")
+library(tidyverse)
+library(ggplot2)
+source("../utils.R")
+```
+
+```{r}
+df <- readRDS("cases/tratamento.rds")
+```
