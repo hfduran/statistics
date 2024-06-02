@@ -6,8 +6,14 @@ html_document: default
 ```{r}
   install.packages("tidyverse")
   install.packages("ggplot2")
-  library(tidyverse)
+  install.packages("ggpubr")
+  install.packages("broom")
+  install.packages("AICcmodavg")
   library(ggplot2)
+  library(ggpubr)
+  library(tidyverse)
+  library(broom)
+  library(AICcmodavg)
   source("../utils.R")
 ```
 
@@ -15,7 +21,7 @@ html_document: default
   df <- readRDS("tratamento.rds")
 ```
 
-```{r separating-dortmund-data}
+```{r separating-data}
   gf_df <- subset(df, MEIO == "GF")
   gc_df <- subset(df, MEIO == "GC")
   lj_df <- subset(df, MEIO == "LJ")
@@ -26,15 +32,15 @@ html_document: default
 
 ```{r boxplot}
   data1 <- data.frame(
-    Group = rep("Crescimento - Gema Fresca", length(cresc_gf)),
+    Group = rep("GL", length(cresc_gf)),
     Value = cresc_gf
   )
   data2 <- data.frame(
-    Group = rep("Crescimento - Gema Comercial", length(cresc_gc)),
+    Group = rep("GC", length(cresc_gc)),
     Value = cresc_gc
   )
   data3 <- data.frame(
-    Group = rep("Crescimento - Low Jeinsen", length(cresc_lj)),
+    Group = rep("LJ", length(cresc_lj)),
     Value = cresc_lj
   )
   # Combine data frames
@@ -42,14 +48,135 @@ html_document: default
   # Create the boxplot
   ggplot(data, aes(x = Group, y = Value, fill = Group)) +
   geom_boxplot() +
-  labs(title = "Side-by-Side Boxplot",
-  x = "Group",
-  y = "Value") +
+  labs(title = "Desenvolvimento bacteriano por cultura",
+  x = "Meio de desenvolvimento",
+  y = "Crescimento") +
   ylim(0, 2.5)
 ```
 
-```{r dortmund-summary}
+```{r summary}
   print(summary(cresc_gf))
   print(summary(cresc_gc))
   print(summary(cresc_lj))
 ```
+
+```{r anova}
+  test = aov(Value ~ Group, data)
+  summary(test)
+  TukeyHSD(test)
+```
+
+```{r separating-data}
+  trat_1_df <- subset(df, TRAT == 1)
+  trat_2_df <- subset(df, TRAT == 2)
+  trat_3_df <- subset(df, TRAT == 3)
+  cresc_1 <- trat_1_df$CRESCIMENTO
+  cresc_2 <- trat_2_df$CRESCIMENTO
+  cresc_3 <- trat_3_df$CRESCIMENTO
+```
+
+```{r boxplot}
+  data1 <- data.frame(
+    Group = rep("TRAT_1", length(cresc_1)),
+    Value = cresc_1
+  )
+  data2 <- data.frame(
+    Group = rep("TRAT_2", length(cresc_2)),
+    Value = cresc_2
+  )
+  data3 <- data.frame(
+    Group = rep("TRAT_3", length(cresc_3)),
+    Value = cresc_3
+  )
+  # Combine data frames
+  data <- rbind(data1, data2, data3)
+  # Create the boxplot
+  ggplot(data, aes(x = Group, y = Value, fill = Group)) +
+  geom_boxplot() +
+  labs(title = "Desenvolvimento bacteriano por tipo de tratamento",
+  x = "Tratamento",
+  y = "Crescimento") +
+  ylim(0, 2.5)
+```
+
+```{r summary}
+  print(summary(cresc_1))
+  print(summary(cresc_2))
+  print(summary(cresc_3))
+```
+
+```{r anova}
+  test = aov(Value ~ Group, data)
+  summary(test)
+  TukeyHSD(test)
+```
+
+```{r separating-data}
+  
+  trat_1_gf_df <- subset(subset(df, MEIO == "GF"), TRAT == 1)
+  trat_1_gc_df <- subset(subset(df, MEIO == "GC"), TRAT == 1)
+  trat_1_lj_df <- subset(subset(df, MEIO == "LJ"), TRAT == 1)
+  trat_2_gf_df <- subset(subset(df, MEIO == "GF"), TRAT == 2)
+  trat_2_gc_df <- subset(subset(df, MEIO == "GC"), TRAT == 2)
+  trat_2_lj_df <- subset(subset(df, MEIO == "LJ"), TRAT == 2)
+  trat_3_gf_df <- subset(subset(df, MEIO == "GF"), TRAT == 3)
+  trat_3_gc_df <- subset(subset(df, MEIO == "GC"), TRAT == 3)
+  trat_3_lj_df <- subset(subset(df, MEIO == "LJ"), TRAT == 3)
+```
+
+```{r}
+  data1 <- data.frame(
+    Meio = rep("GF", length(trat_1_gf_df$CRESCIMENTO)),
+    Trat = rep("1", length(trat_1_gf_df$CRESCIMENTO)),
+    Cresc = trat_1_gf_df$CRESCIMENTO
+  )
+  data2 <- data.frame(
+    Meio = rep("GC", length(trat_1_gc_df$CRESCIMENTO)),
+    Trat = rep("1", length(trat_1_gc_df$CRESCIMENTO)),
+    Cresc = trat_1_gc_df$CRESCIMENTO
+  )
+  data3 <- data.frame(
+    Meio = rep("LJ", length(trat_1_lj_df$CRESCIMENTO)),
+    Trat = rep("1", length(trat_1_lj_df$CRESCIMENTO)),
+    Cresc = trat_1_lj_df$CRESCIMENTO
+  )
+  data4 <- data.frame(
+    Meio = rep("GL", length(trat_2_gf_df$CRESCIMENTO)),
+    Trat = rep("2", length(trat_2_gf_df$CRESCIMENTO)),
+    Cresc = trat_2_gf_df$CRESCIMENTO
+  )
+  data5 <- data.frame(
+    Meio = rep("GC", length(trat_2_gc_df$CRESCIMENTO)),
+    Trat = rep("2", length(trat_2_gc_df$CRESCIMENTO)),
+    Cresc = trat_2_gc_df$CRESCIMENTO
+  )
+  data6 <- data.frame(
+    Meio = rep("LJ", length(trat_2_lj_df$CRESCIMENTO)),
+    Trat = rep("2", length(trat_2_lj_df$CRESCIMENTO)),
+    Cresc = trat_2_lj_df$CRESCIMENTO
+  )
+  data7 <- data.frame(
+    Meio = rep("GF", length(trat_3_gf_df$CRESCIMENTO)),
+    Trat = rep("3", length(trat_3_gf_df$CRESCIMENTO)),
+    Cresc = trat_3_gf_df$CRESCIMENTO
+  )
+  data8 <- data.frame(
+    Meio = rep("GC", length(trat_3_gc_df$CRESCIMENTO)),
+    Trat = rep("3", length(trat_3_gc_df$CRESCIMENTO)),
+    Cresc = trat_3_gc_df$CRESCIMENTO
+  )
+  data9 <- data.frame(
+    Meio = rep("LJ", length(trat_3_lj_df$CRESCIMENTO)),
+    Trat = rep("3", length(trat_3_lj_df$CRESCIMENTO)),
+    Cresc = trat_3_lj_df$CRESCIMENTO
+  )
+  # Combine data frames
+  data <- rbind(data1, data2, data3, data4, data5, data6, data7, data8, data9)
+```
+
+```{r anova}
+  test = aov(Cresc ~ Meio + Trat, data)
+  summary(test)
+  TukeyHSD(test)
+```
+
