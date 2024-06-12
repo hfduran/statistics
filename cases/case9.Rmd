@@ -1,0 +1,34 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+install.packages("tidyverse")
+install.packages("ggplot2")
+library(tidyverse)
+library(ggplot2)
+source("../utils.R")
+```
+
+```{r}
+df <- readRDS("vendas.rds")
+```
+
+```{r}
+modelo = lm(vendas ~tv, data=df)
+
+#Resíduos
+plot(modelo)
+
+#Regressão linear
+plot(c(0,300), c(0,300), type = "n", xlab = "x", ylab = "y")
+abline(modelo$coefficients[1], modelo$coefficients[2])
+```
+
+```{r}
+summary(modelo)
+#Ambos tiveram p-valores menor do que 0.05. Rejeita-se H0 - o modelo de regressão È significativo
+#R² = 0.8122
+```
