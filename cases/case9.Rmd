@@ -32,3 +32,17 @@ summary(modelo)
 #Ambos tiveram p-valores menor do que 0.05. Rejeita-se H0 - o modelo de regressão È significativo
 #R² = 0.8122
 ```
+
+```{r}
+tv = data.frame(tv=sort(df$tv))
+
+estimados_IC = predict(modelo, tv, interval = "confidence")
+previstos_IP = predict(modelo, tv, interval = "prediction")
+
+plot(estimados_IC[,1])
+lines(estimados_IC[,2], col="#FF0000")
+lines(estimados_IC[,3], col="#FF0000")
+plot(previstos_IP[,1])
+lines(previstos_IP[,2], col="#FF0000")
+lines(previstos_IP[,3], col="#FF0000")
+```
