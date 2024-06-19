@@ -34,6 +34,27 @@ summary(modelo)
 ```
 
 ```{r}
+plot_histogram = function(data, aes_func, title) {
+  print(round(sqrt(nrow(data)), digits = 0))
+  ggplot(data, aes_func) +
+  geom_histogram(bins = round(sqrt(nrow(data)), digits = 0)) +
+  ggtitle(title) + 
+  ylab("Frequência") +
+  xlab("Retorno") #Alterar labels
+}
+```
+
+```{r}
+  df_residuals = data.frame (
+    residuals = modelo$residuals
+  )
+
+  plot_histogram(df_residuals, aes(residuals), "Resíduos")
+  
+  paste("Média dos resíduos: ", mean(df_residuals$residuals))
+```
+
+```{r}
 tv = data.frame(tv=sort(df$tv))
 
 estimados_IC = predict(modelo, tv, interval = "confidence")
