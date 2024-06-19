@@ -67,3 +67,8 @@ plot(previstos_IP[,1])
 lines(previstos_IP[,2], col="#FF0000")
 lines(previstos_IP[,3], col="#FF0000")
 ```
+
+```{r}
+  test = aov(vendas ~ tv, df)
+  summary(test)
+```
