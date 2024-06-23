@@ -1,0 +1,32 @@
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+assets <- readRDS("acoes.rds")
+tratamento <- readRDS("tratamento.rds")
+```
+
+```{r}
+t.test(assets$ITUB3, assets$PRIO3, alternative = "two.sided")
+```
+
+Como o p-value é de 0.13, não podemos afirmar com 5% de significância que as duas médias são diferentes
+
+```{r}
+df_acoes1 <- assets %>% select(ITUB3)
+df_acoes2 <- assets %>% select(PRIO3)
+
+df_acoes1$acao = "ITUB3"
+df_acoes2$acao = "PRIO3"
+
+colnames(df_acoes1)[1] <- c("valor")
+colnames(df_acoes2)[1] <- c("valor")
+
+df_acoes_bartlett <- rbind(df_acoes1, df_acoes2)
+
+bartlett.test(df_acoes_bartlett$valor, df_acoes_bartlett$acao)
+```
+
+p-valor = 2.2e-16 muito baixo. Para significancia de 0.05, rejeita-se a hipótese nula de que as variâncias são iguais.
